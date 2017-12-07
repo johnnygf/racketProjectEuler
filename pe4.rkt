@@ -33,31 +33,60 @@
     (cond
         [(< m 10) (modulo m 10)]
         [(getMostSignificantDigit (floor (/ m 10)))]
-    ))
+    )
+)
 
 (define (getLeastSignificantDigit l)
-    (modulo l 10))
+    (modulo l 10)
+)
 
 (define (removeMostSignificantDigit r) 
     (- r (* (expt 10 (- (getPlaceValueMostSignificantDigit r 0) 1)) (getMostSignificantDigit r)))
-    )
+)
 
 (define (removeLeastSignificantDigit r)
     (floor (/ r 10))
-    )
+)
 
 (define (getPlaceValueMostSignificantDigit p v)
     (cond
         [(< p 10) (+ v 1)]
         [(getPlaceValueMostSignificantDigit (/ p 10) (+ v 1))]
-    ))
+    )
+)
+
+(define (getNumberTraillingZeroes n m)
+    (cond
+        [(> (getLeastSignificantDigit n) 0) m]
+        [(= (getLeastSignificantDigit n) 0) (getNumberTraillingZeroes (removeLeastSignificantDigit n) (+ m 1))]
+    )
+)
+
+(define (removeTraillingZeroes t)
+    (cond
+        [(> (getLeastSignificantDigit t) 0) t]
+        [(= (getLeastSignificantDigit t) 0) (removeTraillingZeroes (removeLeastSignificantDigit t))]
+    )
+)
 
 (define (isPalindrome? p)
     (cond 
-        [(<= p 10) #f]
+        [(<= p 10) #t]
         [(and (< p 1000) (= (getMostSignificantDigit p) (getLeastSignificantDigit p))) #t]
+        [(and 
+            (= (getMostSignificantDigit p) (getLeastSignificantDigit p))
+            (= 
+                (- 
+                    (getPlaceValueMostSignificantDigit p 0) 
+                    (getPlaceValueMostSignificantDigit (removeMostSignificantDigit p) 0)
+                )
+                (getNumberTraillingZeroes (removeMostSignificantDigit p) 0)
+                )
+            )
+            (isPalindrome? (removeTraillingZeroes (removeMostSignificantDigit p)))]
         [else #f]
-    ))
+    )
+)
 
 (displayln "")
 (printf " 9: isPalindrome? = ~a~n" (isPalindrome? 9))
@@ -68,6 +97,8 @@
 (printf "22: isPalindrome? = ~a~n" (isPalindrome? 22))
 (printf "303: isPalindrome? = ~a~n" (isPalindrome? 303))
 (printf "989: isPalindrome? = ~a~n" (isPalindrome? 989))
+(printf "19891: isPalindrome? = ~a~n" (isPalindrome? 19891))
+(printf "1008001: isPalindrome? = ~a~n" (isPalindrome? 1008001))
 
 (printf "  9: getMostSignificantDigit = ~a~n" (getMostSignificantDigit 9))
 (printf " 10: getMostSignificantDigit = ~a~n" (getMostSignificantDigit 10))
@@ -86,3 +117,11 @@
 
 (printf "21: removeLeastSignificantDigit = ~a~n" (removeLeastSignificantDigit 21))
 (printf "211: removeLeastSignificantDigit = ~a~n" (removeLeastSignificantDigit 211))
+
+(printf "10: getNumberTraillingZeroes = ~a~n" (getNumberTraillingZeroes 10 0))
+(printf "100: getNumberTraillingZeroes = ~a~n" (getNumberTraillingZeroes 100 0))
+(printf "1000: getNumberTraillingZeroes = ~a~n" (getNumberTraillingZeroes 1000 0))
+
+(printf "10: removeTraillingZeroes = ~a~n" (removeTraillingZeroes 10))
+(printf "900: removeTraillingZeroes = ~a~n" (removeTraillingZeroes 900))
+(printf "8000: removeTraillingZeroes = ~a~n" (removeTraillingZeroes 8000))
